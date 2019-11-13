@@ -3,5 +3,5 @@
 #
 
 # Kubectl bash completion
-[[ -f ~/.kube/completion.bash.inc ]] && . ~/.kube/completion.bash.inc
+[[ -f $HOME/.kube/completion.bash.inc ]] && . $HOME/.kube/completion.bash.inc
 
