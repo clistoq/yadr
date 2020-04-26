@@ -1,4 +1,6 @@
 #!/bin/sh
+export _JAVA_AWT_WM_NONREPARENTING=1
+wmname LG3D
 
 userresources=$HOME/.Xresources
 usermodmap=$HOME/.Xmodmap
@@ -32,7 +34,9 @@ if [ -d /etc/X11/xinit/xinitrc.d ] ; then
  unset f
 fi
 
-feh --bg-scale $HOME/Pictures/Wallpaper/arthas_lich-king.jpg &
-dwmstatus 2>&1 >/dev/null &
+nitrogen --restore &
+picom -CG &
+dwmblocks &
 
 exec dwm
+

@@ -9,10 +9,16 @@ call vundle#begin()
 "call vundle#begin('~/some/path/here')
 
 " let Vundle manage Vundle, required
+if has('nvim')
+  Plugin 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+else
+  Plugin 'Shougo/deoplete.nvim'
+  Plugin 'roxma/nvim-yarp'
+  Plugin 'roxma/vim-hug-neovim-rpc'
+endif
 Plugin 'VundleVim/Vundle.vim'
 Plugin 'dhruvasagar/vim-table-mode'
 Plugin 'vim-syntastic/syntastic'
-Plugin 'Valloric/YouCompleteMe'
 Plugin 'scrooloose/nerdtree'
 Plugin 'tpope/vim-fugitive'
 Plugin 'godlygeek/tabular'
@@ -26,6 +32,8 @@ Plugin 'leafgarland/typescript-vim'
 Plugin 'morhetz/gruvbox'
 Plugin 'martinda/jenkinsfile-vim-syntax'
 Plugin 'ekalinin/dockerfile.vim'
+Plugin 'vim-airline/vim-airline'
+Plugin 'vim-airline/vim-airline-themes'
 
 " The following are examples of different formats supported.
 " Keep Plugin commands between vundle#begin/end.
@@ -58,32 +66,70 @@ filetype plugin indent on    " required
 "
 " see :h vundle for more details or wiki for FAQ
 " Put your non-Plugin stuff after this line
-set expandtab
-set shiftwidth=4
-set tabstop=4
-set smartindent
-set undofile                " Save undo's after file closes
-set undodir=$HOME/.vim/undo " where to save undo histories
-set undolevels=1000         " How many undos
-set undoreload=10000        " number of lines to save for undo
 
+"--------------------------------------------------------------------------------
+" configure editor with tabs and nice stuff...
+"--------------------------------------------------------------------------------
+set expandtab
+set textwidth=80               " break lines when line length increases
+set tabstop=2                   " use 2 spaces to represent tab
+set softtabstop=2
+set shiftwidth=2                " number of spaces to use for auto indent
+set autoindent                  " copy indent from current line when starting a new line
+set smartindent
+set undofile                    " Save undo's after file closes
+set undodir=$HOME/.vim/undo     " where to save undo histories
+set undolevels=1000             " How many undos
+set undoreload=10000            " number of lines to save for undo
+set showcmd                     " show (partial) command in status line
+set showmode
+set backspace=indent,eol,start  " make backspaces more powerfull
+set number
+set wrap
+set linebreak
+set nolist
+
+" configure expanding of tabs for various file types
+au FileType python setlocal sw=2 sts=2 ts=2 expandtab
+au FileType yaml setlocal sw=2 sts=2 ts=2 expandtab
+au BufRead,BufNewFile *.yaml set expandtab
+au BufRead,BufNewFile *.yml set expandtab
+au BufRead,BufNewFile *.c set noexpandtab
+au BufRead,BufNewFile *.h set noexpandtab
+au BufRead,BufNewFile Makefile* set noexpandtab
+au BufRead,BufNewFile Dockerfile* set noexpandtab
+au BufRead * normal zR    " Unfold everything on file open
+augroup filetype
+    au! BufRead,BufNewFile *.ll     set filetype=llvm
+augroup END
+
+let NERDTreeShowHidden=1
 autocmd vimenter * NERDTree
 autocmd VimEnter * wincmd p
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 set hlsearch
 
 " Theme configuration
-colorscheme gruvbox
+colorscheme atom-dark-256
 set background=dark
-let g:gruvbox_contrast_dark="hard"
+" let g:gruvbox_contrast_dark="hard"
 
-augroup filetype
-    au! BufRead,BufNewFile *.ll     set filetype=llvm
-augroup END
-let g:EclimCompletionMethod = 'omnifunc'
+"let g:EclimCompletionMethod = 'omnifunc'
 
-au BufRead * normal zR    " Unfold everything on file open
-autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
+set statusline+=%#warningmsg#
+set statusline+=%{SyntasticStatuslineFlag()}
+set statusline+=%*
+
+let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_auto_loc_list = 1
+let g:syntastic_check_on_open = 1
+let g:syntastic_check_on_wq = 0
+let g:syntastic_python_checkers = ['pylint']
+
+set wrapmargin=0
+let g:airline_powerline_fonts = 1
+
+let g:deoplete#enable_at_startup = 1
 
 match ErrorMsg '\%>80v.\+'
 match ErrorMsg /\s\+\%#\@<!$/
