@@ -16,6 +16,7 @@ else
   Plugin 'roxma/nvim-yarp'
   Plugin 'roxma/vim-hug-neovim-rpc'
 endif
+Plugin 'junegunn/fzf'
 Plugin 'VundleVim/Vundle.vim'
 Plugin 'dhruvasagar/vim-table-mode'
 Plugin 'vim-syntastic/syntastic'
@@ -34,6 +35,9 @@ Plugin 'martinda/jenkinsfile-vim-syntax'
 Plugin 'ekalinin/dockerfile.vim'
 Plugin 'vim-airline/vim-airline'
 Plugin 'vim-airline/vim-airline-themes'
+Plugin 'scrooloose/vim-slumlord'
+Plugin 'aklt/plantuml-syntax'
+
 
 " The following are examples of different formats supported.
 " Keep Plugin commands between vundle#begin/end.
@@ -71,7 +75,6 @@ filetype plugin indent on    " required
 " configure editor with tabs and nice stuff...
 "--------------------------------------------------------------------------------
 set expandtab
-set textwidth=80               " break lines when line length increases
 set tabstop=2                   " use 2 spaces to represent tab
 set softtabstop=2
 set shiftwidth=2                " number of spaces to use for auto indent
@@ -88,6 +91,26 @@ set number
 set wrap
 set linebreak
 set nolist
+
+"--------------------------------------------------------------------------------
+" Buffer shortcuts configuration
+"--------------------------------------------------------------------------------
+set switchbuf=usetab,newtab
+nnoremap <PageUp>   :tabn<CR>
+nnoremap <PageDown> :tabp<CR>
+nnoremap <C-N>      :tabnew<CR> 
+
+" FZF configuration
+nnoremap <silent> <leader>f :FZF<cr>
+nnoremap <silent> <leader>F :FZF ~<cr>
+
+highlight ExtraWhitespace ctermbg=red guibg=red
+match ExtraWhitespace /\s\+\%#\@<!$/
+autocmd BufWinEnter * match ExtraWhitespace /\s\+\%#\@<!$/
+autocmd InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
+autocmd InsertLeave * match ExtraWhitespace /\s\+\%#\@<!$/
+
+match ErrorMsg '\%>80v.\+'
 
 " configure expanding of tabs for various file types
 au FileType python setlocal sw=2 sts=2 ts=2 expandtab
@@ -112,7 +135,6 @@ set hlsearch
 " Theme configuration
 colorscheme atom-dark-256
 set background=dark
-" let g:gruvbox_contrast_dark="hard"
 
 "let g:EclimCompletionMethod = 'omnifunc'
 
@@ -128,8 +150,7 @@ let g:syntastic_python_checkers = ['pylint']
 
 set wrapmargin=0
 let g:airline_powerline_fonts = 1
+let g:airline#extensions#tabline#enabled = 1
 
 let g:deoplete#enable_at_startup = 1
 
-match ErrorMsg '\%>80v.\+'
-match ErrorMsg /\s\+\%#\@<!$/
