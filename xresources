@@ -1,0 +1,23 @@
+Xft.autohint: 0
+Xft.lcdfilter:  lcddefault
+Xft.hintstyle:  hintfull
+Xft.hinting: 1
+Xft.antialias: 1
+Xft.rgba: rgb
+
+urxvt*internalBorder: 5
+urxvt*dynamicColors: on
+!*URxvt.perl-ext-common:         osc-xterm-clipboard
+#include "/home/rootnode/.colors/kantan"
+URxvt.scrollBar: false
+URxvt.inputMethod: ibus
+URxvt.preeditType: OverTheSpot
+
+URxvt.font:xft:Source Code Pro for Powerline:pixelsize=14
+URxvt.boldFont:xft:Source Code Pro for Powerline:pixelsize=14
+
+URxvt.underlineURLs: true
+URxvt.url-select.launcher:                      /usr/bin/google-chrome-beta
+URxvt.url-select.underline:                     true
+URxvt*cursorBlink:                              true
+URxvt*cursorUnderline:                          true
