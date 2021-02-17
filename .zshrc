@@ -1,15 +1,41 @@
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
+set -o vi
+setopt autocd              # change directory just by typing its name
+setopt interactivecomments # allow comments in interactive mode
+setopt magicequalsubst     # enable filename expansion for arguments of the form ‘anything=expression’
+setopt notify              # report the status of background jobs immediately
+setopt numericglobsort     # sort filenames numerically when it makes sense
+setopt promptsubst         # enable command substitution in prompt
+
+WORDCHARS=${WORDCHARS//\/} # Don't consider certain characters part of the word
+
 # Path to your oh-my-zsh installation.
 export ZSH="/home/clistoq/.oh-my-zsh"
 
-set -o vi
+# Turn on autocompletion for all commands and its switches
+# and also autocompletion in privileged mode.
+autoload -Uz compinit
+zstyle ':completion::complete:*' gain-privileges 1
+zstyle ':completion:*:*:*:*:*' menu select
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' # case insensitive tab completion
 
-autoload -Uz compinit; compinit
+# History configurations
+HISTFILE=~/.zsh_history
+HISTSIZE=1000
+SAVEHIST=2000
+setopt hist_expire_dups_first # delete duplicates first when HISTFILE size exceeds HISTSIZE
+setopt hist_ignore_dups       # ignore duplicated commands history list
+setopt hist_ignore_space      # ignore commands that start with space
+setopt hist_verify            # show command with history expansion to user before running it
+#setopt share_history         # share command history data
+
+# force zsh to show the complete history
+alias history="history 0"
 
 # Set browser for URLs from terminal
-export BROWSER=firefox
+export BROWSER=waterfox
 
 # Set path variables for individually compiled software
 # Cargo
@@ -19,8 +45,15 @@ export PATH="$HOME/.cargo/bin:$PATH"
 export PATH=/home/rootnode/programs/src/bazel/output:$PATH
 
 # Wrk
-export PATH=/opt/wrk/bin:$PATH
-export WRK_HOME=/opt/wrk
+WRK_HOME=/opt/wrk
+export PATH=$WRK_HOME/bin:$PATH
+
+# Yarn modules
+YARN=$HOME/.yarn/bin
+export PATH=$YARN:$PATH
+
+# Programs installed in /opt/installed
+export PATH=/opt/installed:$PATH
 
 # FZF
 export FZF_BASE="$HOME/.fzf"
@@ -97,7 +130,7 @@ plugins=(
   archlinux
 
   colored-man-pages
-  
+
   docker
   docker-compose
 
@@ -105,7 +138,7 @@ plugins=(
 
   git
   git-flow
-  git-extras 
+  git-extras
   gitignore
 
   golang
@@ -113,19 +146,21 @@ plugins=(
   gradle
 
   helm
-  
+
   kops
   kubectl
 
   mvn
-  
+
   oc
 
   rsync
-  
+
   z)
 
 source $ZSH/oh-my-zsh.sh
+
+[[ $COLORTERM = *(24bit|truecolor)* ]] || zmodload zsh/nearcolor
 
 # User configuration
 
@@ -137,7 +172,11 @@ export LANG=en_US.UTF-8
 # Preferred editor for local and remote sessions
 export EDITOR='vim'
 
-export COLORTERM=rxvt-unicode-256color
+export CLICOLOR=1
+
+# Go environment variables
+GOPATH=$HOME/go/src
+GOBIN=$HOME/go/bin
 
 # Compilation flags
 # export ARCHFLAGS="-arch x86_64"
@@ -151,6 +190,11 @@ export COLORTERM=rxvt-unicode-256color
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 alias l='ls -al'
+
+if [[ $TERM == xterm-termite ]]; then
+  . /etc/profile.d/vte.sh
+  __vte_osc7
+fi
 
 raw-name() {
     echo "$*" | cut -d '.' --complement -f2-

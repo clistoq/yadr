@@ -1,3 +1,4 @@
+set encoding=utf8
 set nocompatible              " be iMproved, required
 syntax on                     " enable backlighting languages syntax
 filetype off                  " required
@@ -9,14 +10,8 @@ call vundle#begin()
 "call vundle#begin('~/some/path/here')
 
 " let Vundle manage Vundle, required
-if has('nvim')
-  Plugin 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-else
-  Plugin 'Shougo/deoplete.nvim'
-  Plugin 'roxma/nvim-yarp'
-  Plugin 'roxma/vim-hug-neovim-rpc'
-endif
-Plugin 'junegunn/fzf'
+Plugin 'lotabout/skim', { 'dir': '~/.skim', 'do': './install' }
+Plugin 'lotabout/skim.vim'
 Plugin 'VundleVim/Vundle.vim'
 Plugin 'dhruvasagar/vim-table-mode'
 Plugin 'vim-syntastic/syntastic'
@@ -37,7 +32,7 @@ Plugin 'vim-airline/vim-airline'
 Plugin 'vim-airline/vim-airline-themes'
 Plugin 'scrooloose/vim-slumlord'
 Plugin 'aklt/plantuml-syntax'
-
+Plugin 'glench/vim-jinja2-syntax'
 
 " The following are examples of different formats supported.
 " Keep Plugin commands between vundle#begin/end.
@@ -87,6 +82,7 @@ set undoreload=10000            " number of lines to save for undo
 set showcmd                     " show (partial) command in status line
 set showmode
 set backspace=indent,eol,start  " make backspaces more powerfull
+set colorcolumn=81
 set number
 set wrap
 set linebreak
@@ -104,11 +100,17 @@ nnoremap <C-N>      :tabnew<CR>
 nnoremap <silent> <leader>f :FZF<cr>
 nnoremap <silent> <leader>F :FZF ~<cr>
 
-highlight ExtraWhitespace ctermbg=red guibg=red
-match ExtraWhitespace /\s\+\%#\@<!$/
-autocmd BufWinEnter * match ExtraWhitespace /\s\+\%#\@<!$/
-autocmd InsertEnter * match ExtraWhitespace /\s\+\%#\@<!$/
-autocmd InsertLeave * match ExtraWhitespace /\s\+\%#\@<!$/
+" Removes trailing spaces
+function TrimWhiteSpace()
+  %s/\s*$//
+  ''
+endfunction
+
+set list listchars=trail:.,extends:>
+autocmd FileWritePre * call TrimWhiteSpace()
+autocmd FileAppendPre * call TrimWhiteSpace()
+autocmd FilterWritePre * call TrimWhiteSpace()
+autocmd BufWritePre * call TrimWhiteSpace()
 
 match ErrorMsg '\%>80v.\+'
 
@@ -151,6 +153,4 @@ let g:syntastic_python_checkers = ['pylint']
 set wrapmargin=0
 let g:airline_powerline_fonts = 1
 let g:airline#extensions#tabline#enabled = 1
-
-let g:deoplete#enable_at_startup = 1
 
