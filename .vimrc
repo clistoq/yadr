@@ -10,9 +10,8 @@ call vundle#begin()
 "call vundle#begin('~/some/path/here')
 
 " let Vundle manage Vundle, required
-Plugin 'lotabout/skim', { 'dir': '~/.skim', 'do': './install' }
-Plugin 'lotabout/skim.vim'
 Plugin 'VundleVim/Vundle.vim'
+Plugin 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plugin 'dhruvasagar/vim-table-mode'
 Plugin 'vim-syntastic/syntastic'
 Plugin 'scrooloose/nerdtree'
@@ -94,7 +93,7 @@ set nolist
 set switchbuf=usetab,newtab
 nnoremap <PageUp>   :tabn<CR>
 nnoremap <PageDown> :tabp<CR>
-nnoremap <C-N>      :tabnew<CR> 
+nnoremap <C-N>      :tabnew<CR>
 
 " FZF configuration
 nnoremap <silent> <leader>f :FZF<cr>
@@ -129,14 +128,14 @@ augroup filetype
 augroup END
 
 let NERDTreeShowHidden=1
-autocmd vimenter * NERDTree
-autocmd VimEnter * wincmd p
+"autocmd vimenter * NERDTree
+"autocmd VimEnter * wincmd p
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 set hlsearch
 
 " Theme configuration
-colorscheme atom-dark-256
-set background=dark
+"colorscheme snazzy
+"set background=dark
 
 "let g:EclimCompletionMethod = 'omnifunc'
 

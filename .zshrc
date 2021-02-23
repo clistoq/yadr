@@ -12,11 +12,11 @@ setopt promptsubst         # enable command substitution in prompt
 WORDCHARS=${WORDCHARS//\/} # Don't consider certain characters part of the word
 
 # Path to your oh-my-zsh installation.
-export ZSH="/home/clistoq/.oh-my-zsh"
+export ZSH="${HOME}/.oh-my-zsh"
 
 # Turn on autocompletion for all commands and its switches
 # and also autocompletion in privileged mode.
-autoload -Uz compinit
+autoload -Uz compinit, bashcompinit
 zstyle ':completion::complete:*' gain-privileges 1
 zstyle ':completion:*:*:*:*:*' menu select
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' # case insensitive tab completion
@@ -59,8 +59,8 @@ export PATH=/opt/installed:$PATH
 export FZF_BASE="$HOME/.fzf"
 
 #THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
-export SDKMAN_DIR="/home/clistoq/.sdkman"
-[[ -s "/home/clistoq/.sdkman/bin/sdkman-init.sh" ]] && source "/home/clistoq/.sdkman/bin/sdkman-init.sh"
+export SDKMAN_DIR="${HOME}/.sdkman"
+[[ -s "${HOME}/.sdkman/bin/sdkman-init.sh" ]] && source "${HOME}/.sdkman/bin/sdkman-init.sh"
 
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
@@ -156,7 +156,8 @@ plugins=(
 
   rsync
 
-  z)
+  z
+  zsh-syntax-highlighting)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -190,6 +191,7 @@ GOBIN=$HOME/go/bin
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 alias l='ls -al'
+alias tmux="tmux -f ${HOME}/.config/tmux/tmux.conf"
 
 if [[ $TERM == xterm-termite ]]; then
   . /etc/profile.d/vte.sh
@@ -232,3 +234,6 @@ md-create-pdf-slides() {
 }
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+eval "$(starship init zsh)"
+
