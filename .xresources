@@ -17,7 +17,7 @@ URxvt.font:xft:Source Code Pro for Powerline:pixelsize=14
 URxvt.boldFont:xft:Source Code Pro for Powerline:pixelsize=14
 
 URxvt.underlineURLs: true
-URxvt.url-select.launcher:                      /usr/bin/google-chrome-beta
+URxvt.url-select.launcher:                      /usr/local/bin/waterfox
 URxvt.url-select.underline:                     true
 URxvt*cursorBlink:                              true
 URxvt*cursorUnderline:                          true
