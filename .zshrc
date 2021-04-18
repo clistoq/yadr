@@ -157,7 +157,8 @@ plugins=(
   rsync
 
   z
-  zsh-syntax-highlighting)
+  zsh-completions
+)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -174,6 +175,10 @@ export LANG=en_US.UTF-8
 export EDITOR='vim'
 
 export CLICOLOR=1
+
+export XDG_RUNTIME_DIR=/run/user/$(id -u)
+
+export $(dbus-launch)
 
 # Go environment variables
 GOPATH=$HOME/go/src
@@ -192,6 +197,7 @@ GOBIN=$HOME/go/bin
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 alias l='ls -al'
 alias tmux="tmux -f ${HOME}/.config/tmux/tmux.conf"
+alias vim="nvim"
 
 if [[ $TERM == xterm-termite ]]; then
   . /etc/profile.d/vte.sh

@@ -1,64 +1,259 @@
-local gears = require('gears')
-local awful = require('awful')
-require('awful.autofocus')
-local beautiful = require('beautiful')
+-- rc.lua
+-- If LuaRocks is installed, make sure that packages installed through it are
+-- found (e.g. lgi). If LuaRocks is not installed, do nothing.
+pcall(require, "luarocks.loader")
+-- Standard awesome library
+local gears = require("gears")
+local gfs = require("gears.filesystem")
+local awful = require("awful")
+require("awful.autofocus")
+-- Widget and layout library
+local wibox = require("wibox")
+-- Theme handling library
+local beautiful = require("beautiful")
+local dpi = require("beautiful.xresources").apply_dpi
+-- Notification library
+local naughty = require("naughty")
+-- Declarative object management
+local ruled = require("ruled")
+local hotkeys_popup = require("awful.hotkeys_popup")
+-- Enable hotkeys help widget for VIM and other apps
+-- when client with a matching name is opened:
+require("awful.hotkeys_popup.keys")
 
--- Theme
-beautiful.init(require('theme'))
+require("collision")()
 
--- Layout
-require('layout')
+-- Helpers Library
+local helpers = require("helpers")
 
--- Init all modules
-require('module.notifications')
-require('module.auto-start')
-require('module.decorate-client')
-require('module.quake-terminal')
--- Backdrop causes bugs on some gtk3 applications
---require('module.backdrop')
-require('module.exit-screen')
+-- Autostart and Errors -------------------------------------------------------
 
--- Setup all configurations
-require('configuration.client')
-require('configuration.tags')
-_G.root.keys(require('configuration.keys.global'))
+local autostart = require("autostart")
 
--- Signal function to execute when a new client appears.
-_G.client.connect_signal(
-  'manage',
-  function(c)
-    -- Set the windows at the slave,
-    -- i.e. put it at the end of others instead of setting it master.
-    if not _G.awesome.startup then
-      awful.client.setslave(c)
-    end
+-- Check if awesome encountered an error during startup and fell back to
+-- another config (This code will only ever execute for the fallback config)
+naughty.connect_signal("request::display_error", function(message, startup)
+    naughty.notification {
+        urgency = "critical",
+        title = "Oops, an error happened" ..
+            (startup and " during startup!" or "!"),
+        message = message
+    }
+end)
 
-    if _G.awesome.startup and not c.size_hints.user_position and not c.size_hints.program_position then
-      -- Prevent clients from being unreachable after screen count changes.
-      awful.placement.no_offscreen(c)
-    end
-  end
-)
+-- Variables & Inits ----------------------------------------------------------
 
--- Enable sloppy focus, so that focus follows mouse.
-_G.client.connect_signal(
-  'mouse::enter',
-  function(c)
-    c:emit_signal('request::activate', 'mouse_enter', {raise = true})
-  end
-)
+-- Set Theme
+theme = "ghosts"
+beautiful.init(gfs.get_configuration_dir() .. "theme/" .. theme .. "/theme.lua")
 
+-- Default Applications
+terminal = "alacritty"
+editor = os.getenv("EDITOR") or "nvim"
+editor_cmd = terminal .. " -e " .. editor
+browser = "waterfox-g3"
+filemanager = "thunar"
+discord = "discord-canary"
+launcher = "rofi -show drun"
+music = terminal .. " -c music -e ncspot"
 
--- Make the focused window have a glowing border
-_G.client.connect_signal(
-  'focus',
-  function(c)
-    c.border_color = beautiful.border_focus
-  end
-)
-_G.client.connect_signal(
-  'unfocus',
-  function(c)
-    c.border_color = beautiful.border_normal
-  end
-)
+-- Dims
+screen_width = awful.screen.focused().geometry.width
+screen_height = awful.screen.focused().geometry.height
+
+-- Default modkey.
+-- Usually, Mod4 is the key with a logo between Control and Alt.
+-- If you do not like this or do not have such a key,
+-- I suggest you to remap Mod4 to another key using xmodmap or other tools.
+-- However, you can use another modifier like Mod1, but it may interact with others.
+modkey = "Mod4"
+altkey = "Mod1"
+shift = "Shift"
+ctrl = "Control"
+
+-- Import Bling Module
+local bling = require("bling")
+-- Playerctl signal
+bling.signal.playerctl.enable()
+
+-- Layouts
+require("window")
+
+-- Screen Stuff ---------------------------------------------------------------
+
+-- Set Wallpaper
+screen.connect_signal("request::wallpaper", function(s)
+    --[[ bling.module.tiled_wallpaper("", s, {
+        fg = beautiful.xcolor8,
+        bg = beautiful.xcolor0,
+        offset_y = beautiful.wibar_height + 5,
+        offset_x = 0,
+        font = "FiraCode Nerd Font Mono",
+        font_size = 12,
+        padding = 60,
+        zickzack = true
+    }) --]]
+
+    gears.wallpaper.fit(beautiful.wallpaper, s, false, nil)
+end)
+
+screen.connect_signal("request::desktop_decoration", function(s)
+    -- Screen padding
+    screen[s].padding = {left = 0, right = 0, top = 0, bottom = 0}
+
+    -- Each screen has its own tag table.
+    awful.tag({"1", "2", "3", "4", "5", "6"}, s, awful.layout.layouts[1])
+end)
+
+-- Keys -----------------------------------------------------------------------
+
+require("keys")
+
+-- Rules ----------------------------------------------------------------------
+
+ruled.client.connect_signal("request::rules", function()
+
+    -- Global
+    ruled.client.append_rule {
+        id = "global",
+        rule = {},
+        properties = {
+            focus = awful.client.focus.filter,
+            raise = true,
+            size_hints_honor = false,
+            screen = awful.screen.preferred,
+            placement = awful.placement.centered + awful.placement.no_overlap +
+                awful.placement.no_offscreen
+        }
+    }
+
+    -- Tasklist order
+    ruled.client.append_rule {
+        id = "tasklist_order",
+        rule = {},
+        properties = {},
+        callback = awful.client.setslave
+    }
+
+    -- Floate em
+    ruled.client.append_rule {
+        id = "floating",
+        rule_any = {
+            class = {"Arandr", "Blueman-manager", "Sxiv", "fzfmenu"},
+            role = {
+                "pop-up" -- e.g. Google Chrome's (detached) Developer Tools.
+            },
+            name = {"Friends List", "Steam - News"}
+        },
+        properties = {floating = true}
+    }
+
+    -- Borders
+    ruled.client.append_rule {
+        id = "borders",
+        rule_any = {type = {"normal", "dialog"}},
+        except_any = {
+            role = {"Popup"},
+            type = {"splash"},
+            name = {"^discord.com is sharing your screen.$"}
+        },
+        properties = {
+            border_width = beautiful.border_width,
+            border_color = beautiful.border_normal
+        }
+    }
+
+    -- Center Placement
+    ruled.client.append_rule {
+        id = "center_placement",
+        rule_any = {
+            type = {"dialog"},
+            class = {
+                "Steam", "discord", "music", "markdown_input", "scratchpad"
+            },
+            instance = {"music", "markdown_input", "scratchpad"},
+            role = {"GtkFileChooserDialog", "conversation"}
+        },
+        properties = {placement = awful.placement.center}
+    }
+
+    -- Titlebar rules
+    ruled.client.append_rule {
+        id = "titlebars",
+        rule_any = {type = {"normal", "dialog"}},
+        except_any = {
+            class = {"Steam", "zoom", "jetbrains-studio"},
+            type = {"splash"},
+            name = {"^discord.com is sharing your screen.$"}
+        },
+        properties = {titlebars_enabled = true}
+    }
+end)
+
+ruled.client.append_rules {
+    {
+        rule = {instance = 'sun-awt-X11-XFramePeer', class = 'jetbrains-studio'},
+        properties = {titlebars_enabled = false, floating = false}
+    }, {
+        rule = {
+            instance = 'sun-awt-X11-XWindowPeer',
+            class = 'jetbrains-studio',
+            type = 'dialog'
+        },
+        properties = {
+            titlebars_enabled = false,
+            border_width = 0,
+            floating = true,
+            focus = true
+        }
+    }, {
+        rule = {
+            instance = 'sun-awt-X11-XFramePeer',
+            class = 'jetbrains-studio',
+            name = 'Android Virtual Device Manager'
+        },
+        properties = {
+            titlebars_enabled = true,
+            floating = true,
+            focus = true,
+            placement = awful.placement.centered
+        }
+    }, {
+        rule = {
+            instance = 'sun-awt-X11-XFramePeer',
+            class = 'jetbrains-studio',
+            name = 'Welcome to Android Studio'
+        },
+        properties = {
+            titlebars_enabled = false,
+            floating = true,
+            focus = true,
+            placement = awful.placement.centered
+        }
+    }, {
+        rule = {
+            instance = 'sun-awt-X11-XWindowPeer',
+            class = 'jetbrains-studio',
+            name = 'win0'
+        },
+        properties = {
+            titlebars_enabled = false,
+            floating = true,
+            focus = true,
+            border_width = 0,
+            placement = awful.placement.centered
+        }
+    }
+}
+
+-- Import Daemons and Widgets
+require("ears")
+require("bloat")
+
+collectgarbage("setpause", 110)
+collectgarbage("setstepmul", 1000)
+
+-- collectgarbage("setpause", 160)
+-- collectgarbage("setstepmul", 400)
+
+-- EOF ------------------------------------------------------------------------

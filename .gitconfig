@@ -1,0 +1,28 @@
+[user]
+	email = <email>
+	name = <name>
+	signingkey = <signingkey>
+[commit]
+	gpgsign = true
+[credential "<url>"]
+    username = <username>
+[color]
+    ui = true
+[color "diff"]
+    meta = yellow bold
+    frag = magenta bold
+    old = red bold
+    new = green bold
+[core]
+    autocrlf = input
+    compression = 9
+    excludesfile = ~/.gitignore_global
+    filemode = false
+[diff]
+    mnemonicprefix = true
+[merge]
+    log = true
+    ff = false
+[push]
+    default = simple
+

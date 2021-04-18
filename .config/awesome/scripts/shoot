@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+# My script for screenshots, im bad at scripting pls help to make smaller
+
+img="shot_$(date '+%m%d%H%M%S').png"
+file="$HOME/Pictures/screenshots/$img"
+
+case $1 in
+    "sel")
+        spectacle -b -n $@ -o /tmp/screenshot.png ; xclip -selection clipboard -target image/png -i /tmp/screenshot.png ; paplay /usr/share/sounds/freedesktop/stereo/camera-shutter.oga
+        ;;
+
+    "selnp")
+        spectacle -b -n $@ -o /tmp/screenshot.png ; xclip -selection clipboard -target image/png -i /tmp/screenshot.png ; paplay /usr/share/sounds/freedesktop/stereo/camera-shutter.oga
+        ;;
+
+    "selnpshad")
+        spectacle -b -n $@ -o /tmp/screenshot.png ; xclip -selection clipboard -target image/png -i /tmp/screenshot.png ; paplay /usr/share/sounds/freedesktop/stereo/camera-shutter.oga
+        ;;
+
+    *)
+        import -window root $file
+        ;;
+esac
+
+#xclip -selection clipboard -t image/png -i  $file
+#notify-send -i $file "Screenshot saved"
