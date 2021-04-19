@@ -5,9 +5,9 @@ disabled = true
 disabled = true
 
 [character]
-success_symbol = '[\\$>](bold green)'
-error_symbol = '[\\$>](bold red)'
-vicmd_symbol = '[\\$<](bold blue)'
+success_symbol = '[λ](bold green)'
+error_symbol = '[λ](bold red)'
+vicmd_symbol = '[λ](bold blue)'
 
 [username]
 disabled = true

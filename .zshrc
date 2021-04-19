@@ -1,5 +1,4 @@
-# If you come from bash you might have to change your $PATH.
-# export PATH=$HOME/bin:/usr/local/bin:$PATH
+export PATH=$HOME/bin:/usr/local/bin:$PATH
 
 set -o vi
 setopt autocd              # change directory just by typing its name
@@ -58,9 +57,12 @@ export PATH=/opt/installed:$PATH
 # FZF
 export FZF_BASE="$HOME/.fzf"
 
-#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
+# Krew plugin manager for Kubernetes
+export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
+
+# SDKMAN
 export SDKMAN_DIR="${HOME}/.sdkman"
-[[ -s "${HOME}/.sdkman/bin/sdkman-init.sh" ]] && source "${HOME}/.sdkman/bin/sdkman-init.sh"
+if [[ -s "${HOME}/.sdkman/bin/sdkman-init.sh" ]]; then source "${HOME}/.sdkman/bin/sdkman-init.sh"; fi
 
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
@@ -129,12 +131,16 @@ DISABLE_UPDATE_PROMPT="true"
 plugins=(
   archlinux
 
+  aws
+
   colored-man-pages
 
   docker
   docker-compose
 
   fzf
+
+  gcloud
 
   git
   git-flow
@@ -157,7 +163,6 @@ plugins=(
   rsync
 
   z
-  zsh-completions
 )
 
 source $ZSH/oh-my-zsh.sh
@@ -176,10 +181,6 @@ export EDITOR='vim'
 
 export CLICOLOR=1
 
-export XDG_RUNTIME_DIR=/run/user/$(id -u)
-
-export $(dbus-launch)
-
 # Go environment variables
 GOPATH=$HOME/go/src
 GOBIN=$HOME/go/bin
@@ -197,7 +198,7 @@ GOBIN=$HOME/go/bin
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 alias l='ls -al'
 alias tmux="tmux -f ${HOME}/.config/tmux/tmux.conf"
-alias vim="nvim"
+alias vim='nvim'
 
 if [[ $TERM == xterm-termite ]]; then
   . /etc/profile.d/vte.sh
@@ -239,7 +240,12 @@ md-create-pdf-slides() {
     pandoc -t beamer -V theme:Rochester "$*" -o `(raw-name "$*")`_slides.pdf
 }
 
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+if [ -f '~/.fzf.zsh' ]; then source '~/.fzf.zsh'; fi
+
+# Azure completion script
+if [ -f '/usr/local/share/applications/azure-cli/az.completion' ]; then source '/usr/local/share/applications/azure-cli/az.completion'; fi
+
+# The next line enables shell command completion for gcloud.
+if [ -f '/opt/google-cloud-sdk/completion.zsh.inc' ]; then source '/opt/google-cloud-sdk/completion.zsh.inc'; fi
 
 eval "$(starship init zsh)"
-
